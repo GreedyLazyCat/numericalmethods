@@ -46,7 +46,7 @@ def simpson(a, b, t, func):
 
 
 def f(x, t):
-    return np.sin(x * t)
+    return np.sin(x) * np.sin(t)
 
 
 def main():
@@ -55,41 +55,40 @@ def main():
     print("3. Формула средних треугольников")
     print("4. Формула трапеции")
     print("5. Формула Симпсона")
-    calc_method = int(input("Выберите метод подсчета: "))
+    calc_method = input("Выберите метод подсчета: ")
     eps = float(input("Введите эпсилон: "))
-    alpha, beta = float(input("Введите альфа и бета:"))
+    alpha, beta = map(float, input("Введите альфа и бета:").split(" "))
 
     trange = np.arange(alpha, beta, 0.01)
 
     match calc_method:
-        case 1:
+        case "1":
             s = 1
             sum_func = left_rectangle
-        case 2:
+        case "2":
             s = 1
             sum_func = right_rectangle
-        case 3:
+        case "3":
             s = 2
             sum_func = middle_rectangle 
-        case 4:
+        case "4":
             s = 2
             sum_func = trapezoid 
-        case 5:
+        case "5":
             s = 4 
             sum_func = simpson
     
-    s = []
+    I = []
 
     for t in trange:
-        s.append(integral_calc(a=0, b=np.pi, t=t, sum_func=sum_func, func=f, N=1, eps=eps, s=s))
+        I.append(integral_calc(a=0, b=np.pi * 4, t=t, sum_func=sum_func, func=f, N=1, eps=eps, s=s))
 
     fig, ax = plt.subplots()
-    ax.plot(s, t)
+    ax.plot(trange, I)
 
     ax.set(xlabel='t', ylabel='I(t)')
     ax.grid()
 
-    fig.savefig("test.png")
     plt.show()
-main()
+# main()
 
