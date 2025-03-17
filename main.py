@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
+import math
 
 def Lagrange(x, points):
     n = len(points)
@@ -15,7 +16,7 @@ def Lagrange(x, points):
         result += f
     return result
 
-def integral_calc(a, b, t, sum_func, func, N, eps):
+def integral_calc(*, a, b, t, sum_func, func, N, eps, s):
     prev_sum = np.inf
     while True:
         space = np.linspace(a, b, N)
@@ -23,7 +24,7 @@ def integral_calc(a, b, t, sum_func, func, N, eps):
         for i in range(N - 1):
             int_sum += sum_func(space[i], space[i + 1], t, func)
         
-        if abs(int_sum - prev_sum) < eps:
+        if abs(int_sum - prev_sum) / (math.pow(2, s) - 1) < eps:
             return int_sum 
         N *= 2
         prev_sum = int_sum
@@ -47,27 +48,48 @@ def simpson(a, b, t, func):
 def f(x, t):
     return np.sin(x * t)
 
-print(integral_calc(0, np.pi, 1, middle_rectangle, f, 100, 0.1))
 
 def main():
-    print("1. -//-")
-    print("2. -//-")
-    print("3. -//-")
-    print("4. -//-")
-    print("5. -//-")
-    calc_method = int(print("Выберите метод подсчета: "))
+    print("1. Формула правых треугольников")
+    print("2. Формула левых треугольников")
+    print("3. Формула средних треугольников")
+    print("4. Формула трапеции")
+    print("5. Формула Симпсона")
+    calc_method = int(input("Выберите метод подсчета: "))
     eps = float(input("Введите эпсилон: "))
+    alpha, beta = float(input("Введите альфа и бета:"))
+
+    trange = np.arange(alpha, beta, 0.01)
 
     match calc_method:
         case 1:
-            pass
+            s = 1
+            sum_func = left_rectangle
         case 2:
-            pass
+            s = 1
+            sum_func = right_rectangle
         case 3:
-            pass
+            s = 2
+            sum_func = middle_rectangle 
         case 4:
-            pass
+            s = 2
+            sum_func = trapezoid 
         case 5:
-            pass
+            s = 4 
+            sum_func = simpson
+    
+    s = []
 
+    for t in trange:
+        s.append(integral_calc(a=0, b=np.pi, t=t, sum_func=sum_func, func=f, N=1, eps=eps, s=s))
+
+    fig, ax = plt.subplots()
+    ax.plot(s, t)
+
+    ax.set(xlabel='t', ylabel='I(t)')
+    ax.grid()
+
+    fig.savefig("test.png")
+    plt.show()
 main()
+
