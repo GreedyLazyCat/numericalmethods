@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 EPS = 0.0001
 DEVISIONS_COUNT = 100000
-U_DEVISION_COUNT = 1
+U_DEVISION_COUNT = 50
 
 def derrivative(x, u):
     return 6 * x + u
@@ -80,18 +80,18 @@ def start():
             method = newton_method
         case _:
             print("Такого варианта нет")
-    # try:
-    a, b, A, B = map(float, input("Введите a, b, A, B: ").split())
-    us, roots = method(a, b, A, B, f) 
-    fig, ax = plt.subplots()
-    ax.scatter(us, roots)
+    try:
+        a, b, A, B = map(float, input("Введите a, b, A, B: ").split())
+        us, roots = method(a, b, A, B, f) 
+        fig, ax = plt.subplots()
+        ax.scatter(us, roots)
 
-    ax.set(xlabel='u', ylabel='x')
-    ax.grid()
+        ax.set(xlabel='u', ylabel='x')
+        ax.grid()
 
-    plt.show()
-    # except ValueError:
-        # print("Некорректный ввод")
+        plt.show()
+    except ValueError:
+        print("Некорректный ввод")
 
-# start()
-print(list(approximate_with_derrivative(np.linspace(-2, 2, 10000), f, 1)))
+start()
+# print(list(approximate_with_derrivative(np.linspace(-2, 2, 10000), f, 1)))
