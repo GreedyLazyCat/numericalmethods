@@ -42,11 +42,11 @@ def trapezoid(a, b, t, func):
     return ((func(a, t) + func(b, t)) / 2) * (b - a)
 
 def simpson(a, b, t, func):
-    return ((func(a, t) + 4 * func((a + b, t) / 2) + func(b, t)) / 6) * (b - a)
+    return ((func(a, t) + 4 * func((a + b) / 2, t) + func(b, t)) / 6) * (b - a)
 
 
 def f(x, t):
-    return np.sin(x) * np.sin(t)
+    return np.sin(x * t)
 
 
 def main():
@@ -77,11 +77,14 @@ def main():
         case "5":
             s = 4 
             sum_func = simpson
+        case _:
+            print("Нет такого варианта)")
+            return
     
     I = []
 
     for t in trange:
-        I.append(integral_calc(a=0, b=np.pi * 4, t=t, sum_func=sum_func, func=f, N=1, eps=eps, s=s))
+        I.append(integral_calc(a=0, b=np.pi, t=t, sum_func=sum_func, func=f, N=10, eps=eps, s=s))
 
     fig, ax = plt.subplots()
     ax.plot(trange, I)
@@ -90,5 +93,5 @@ def main():
     ax.grid()
 
     plt.show()
-# main()
-
+main()
+# print(integral_calc(a=0, b=np.pi, t=np.pi/2, sum_func=left_rectangle, func=f, N=100, eps=0.1, s=1))
