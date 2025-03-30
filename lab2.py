@@ -3,7 +3,10 @@ import matplotlib.pyplot as plt
 
 EPS = 0.0001
 DEVISIONS_COUNT = 100000
-U_DEVISION_COUNT = 100
+U_DEVISION_COUNT = 1
+
+def derrivative(x, u):
+    return 6 * x + u
 
 def f(x, u):
     return 3 * x**2 + u * x - 2
@@ -23,6 +26,22 @@ def approximate_func(roots, f, u):
                 second = mid
             else:
                 first = mid
+def approximate_with_derrivative(roots, f, u):
+    prev_root = None
+    for i in range(len(roots) - 1):
+        first = roots[i]
+        second = first - f(first, u) / derrivative(first, u)
+        while (abs(second - first))>EPS:
+            first = second
+            second = first - f(first, u) / derrivative(first, u)
+        if prev_root == None:
+            prev_root = second
+            yield second
+            continue
+        if prev_root != None and abs(second - prev_root) > EPS:
+            prev_root = second
+            yield second
+            
 
 def devide_method(a, b, A, B, f):
     roots = np.linspace(a, b, DEVISIONS_COUNT)
@@ -37,7 +56,15 @@ def devide_method(a, b, A, B, f):
 
 
 def newton_method(a, b, A, B, f):
-    print(f"a: {a} b: {b} A: {A} B: {B}")
+    roots = np.linspace(a, b, DEVISIONS_COUNT)
+    us = np.linspace(A, B, U_DEVISION_COUNT)
+    res_us = []
+    res_roots = []
+    for u in us:
+        for root in approximate_with_derrivative(roots, f, u):
+            res_us.append(u)
+            res_roots.append(root)
+    return res_us, res_roots
 
 
 def start():
@@ -66,5 +93,5 @@ def start():
     # except ValueError:
         # print("Некорректный ввод")
 
-start()
-# print(list(approximate_func(np.linspace(-2, 2, 100000), f, 1)))
+# start()
+print(list(approximate_with_derrivative(np.linspace(-2, 2, 10000), f, 1)))
