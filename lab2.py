@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 EPS = 0.000001
-DEVISIONS_COUNT = 10000
+DEVISIONS_COUNT = 1000
 U_DEVISION_COUNT = 50
 MAX_ITER = 100
 
@@ -27,7 +27,7 @@ def approximate_func(roots, f, u):
                 second = mid
             else:
                 first = mid
-def approximate_with_derrivative(roots, f, u):
+def approximate_with_derrivative(roots, f, u, a, b):
     for i in range(len(roots) - 1):
         first = roots[i]
         second = first - f(first, u) / derrivative(first, u)
@@ -35,6 +35,8 @@ def approximate_with_derrivative(roots, f, u):
         while True:
             if (abs(second - first)) < EPS:
                 yield second
+                break
+            elif second < a or second > b:
                 break
             elif itercount > MAX_ITER:
                 break
@@ -50,12 +52,8 @@ def devide_method(a, b, A, B, f):
     res_roots = []
     for u in us:
         for root in approximate_func(roots, f, u):
-            contains_root = any(abs(old_root - root) < EPS for old_root in res_roots)
-            if contains_root:
-                continue
-            else:
-                res_us.append(u)
-                res_roots.append(root)
+            res_us.append(u)
+            res_roots.append(root)
 
     return res_us, res_roots
 
@@ -66,7 +64,11 @@ def newton_method(a, b, A, B, f):
     res_us = []
     res_roots = []
     for u in us:
-        for root in approximate_with_derrivative(roots, f, u):
+        for root in approximate_with_derrivative(roots, f, u, a, b):
+            contains_root = any(abs(old_root - root) < EPS for old_root in res_roots)
+            if contains_root:
+                continue
+            # elif root > a and root < b:
             res_us.append(u)
             res_roots.append(root)
     return res_us, res_roots
@@ -98,13 +100,13 @@ def start():
     except ValueError:
         print("Некорректный ввод")
 
-# start()
-# print(list())
-test = []
-for root in approximate_with_derrivative(np.linspace(-3, 3, 10000), f, 0):
-    contains_root = any(abs(old_root - root) < EPS for old_root in test)
-    if contains_root:
-        continue
-    else:
-        test.append(root)
-print(test)
+start()
+# print(list(approximate_func(np.linspace(-3, 3, 1000), f, 0.5)))
+# test = []
+# for root in approximate_with_derrivative(np.linspace(-3, 3, 1000), f, 0.5):
+#     contains_root = any(abs(old_root - root) < EPS for old_root in test)
+#     if contains_root:
+#         continue
+#     elif root > -3 and root < 3:
+#         test.append(root)
+# print(test)
