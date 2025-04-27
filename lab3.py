@@ -9,6 +9,14 @@ RECT = [
     [-2.0, 2.0]
 ]
 
+def derrivative_x(x):
+    return 2*(x - 1)
+
+def derrivative_y(y):
+    return 2*(y - 1)
+
+
+
 def f(x):
     return (x[0] - 1)**2 + (x[1] - 1)**2
 
@@ -33,9 +41,6 @@ def one_dim_descent(*, f, x, i, a0, b0, epsilon):
             # b = b
             xi = B
     return xi 
-    
-
-
 
 def coord_descent(epsilon, x0, y0):
     x = np.array([x0, y0])
@@ -43,6 +48,7 @@ def coord_descent(epsilon, x0, y0):
     iter = 0
     while True:
         x = np.copy(xk)
+        yield x
         for i in range(len(xk)):
             xk[i] = one_dim_descent(f=f, x=xk, i=i, a0=RECT[i][0], b0=RECT[i][1], epsilon=epsilon)
         if np.linalg.norm(xk - x) < epsilon:
@@ -54,7 +60,19 @@ def coord_descent(epsilon, x0, y0):
     return xk
 
 def grad_descent(epsilon, x0, y0):
-    print("grad_descent")
+    x = np.array([x0, y0])
+    xk = np.array([x0, y0])
+    while True:
+        x = np.copy(xk)
+        yield x
+
+        def phi(A):
+            return f(xk - A * np.array([derrivative_x(xk[0]), derrivative_y(xk[1])]))
+
+        newA = one_dim_descent(f=phi, x=xk, i=0, a0=0, b0=10000, epsilon=epsilon)
+        xk = (x - newA * np.array([derrivative_x(x[0]), derrivative_y(x[1])]))
+        if np.linalg.norm(xk - x) < epsilon:
+            break
 
 def start():
     print("Выберете метод:")
@@ -84,4 +102,5 @@ def start():
 
 
 # print(one_dim_descent(f=f, x=np.array([0.0, 1.0]), i=0, a0=-2.0, b0=2.0, epsilon=0.0000001))
-print(coord_descent(epsilon=0.000001, x0=0.0, y0=0.0))
+print(list(coord_descent(epsilon=0.000001, x0=0.0, y0=0.0)))
+print(list(grad_descent(epsilon=0.000001, x0=0.0, y0=0.0)))
