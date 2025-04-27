@@ -4,9 +4,13 @@ import matplotlib.pyplot as plt
 
 PHI = (1 + np.sqrt(5)) / 2
 MAX_ITER = 100
+RECT = [
+    [-2.0, 2.0],
+    [-2.0, 2.0]
+]
 
 def f(x):
-    return (x[0] - 2)**2 + (x[1])**2
+    return (x[0] - 1)**2 + (x[1] - 1)**2
 
 def one_dim_descent(*, f, x, i, a0, b0, epsilon):
     a = a0
@@ -34,7 +38,15 @@ def one_dim_descent(*, f, x, i, a0, b0, epsilon):
 
 
 def coord_descent(epsilon, x0, y0):
-    print("coord_descent")
+    x = np.array([x0, y0])
+    xk = np.array([x0, y0])
+    while True:
+        x = np.copy(xk)
+        for i in range(len(xk)):
+            xk[i] = one_dim_descent(f=f, x=xk, i=i, a0=RECT[i][0], b0=RECT[i][1], epsilon=epsilon)
+        if np.linalg.norm(xk - x) < epsilon:
+            break
+    return xk
 
 def grad_descent(epsilon, x0, y0):
     print("grad_descent")
@@ -59,3 +71,6 @@ def start():
     except ValueError:
         print("Некорректный ввод")
 
+
+# print(one_dim_descent(f=f, x=np.array([0.0, 1.0]), i=0, a0=-2.0, b0=2.0, epsilon=0.0000001))
+print(coord_descent(epsilon=0.000001, x0=0.0, y0=0.0))
