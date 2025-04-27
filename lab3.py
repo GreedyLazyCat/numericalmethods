@@ -9,17 +9,18 @@ def f(x):
     return (x[0] - 2)**2 + (x[1])**2
 
 def one_dim_descent(*, f, x, i, a0, b0, epsilon):
-    a = np.copy(x)
-    b = np.copy(x)
-    A = np.copy(x)
-    B = np.copy(x)
-    xi = np.copy(x)
-    a[i] = a0
-    b[i] = b0
-    while (b[i] - a[i]) >= epsilon:
-        A[i] = b[i] - ((b[i] - a[i]) / PHI)
-        B[i] = a[i] + ((b[i] - a[i]) / PHI)
-        if f(A) <= f(B):
+    a = a0
+    b = b0
+    while (b - a) >= epsilon:
+        A = b - ((b - a) / PHI)
+        B = a + ((b - a) / PHI)
+        A_vector = np.copy(x)
+        B_vector = np.copy(x)
+
+        A_vector[i] = A
+        B_vector[i] = B
+
+        if f(A_vector) <= f(B_vector):
             # a = a 
             b = B
             xi = A
@@ -27,7 +28,8 @@ def one_dim_descent(*, f, x, i, a0, b0, epsilon):
             a = A
             # b = b
             xi = B
-    return xi
+    return xi 
+    
 
 
 
