@@ -40,12 +40,17 @@ def one_dim_descent(*, f, x, i, a0, b0, epsilon):
 def coord_descent(epsilon, x0, y0):
     x = np.array([x0, y0])
     xk = np.array([x0, y0])
+    iter = 0
     while True:
         x = np.copy(xk)
         for i in range(len(xk)):
             xk[i] = one_dim_descent(f=f, x=xk, i=i, a0=RECT[i][0], b0=RECT[i][1], epsilon=epsilon)
         if np.linalg.norm(xk - x) < epsilon:
             break
+        if iter > MAX_ITER:
+            break
+        iter += 1
+        
     return xk
 
 def grad_descent(epsilon, x0, y0):
