@@ -67,7 +67,13 @@ def start():
 
     try:
         epsilon, x0, y0 = map(float, input("Введите epsilon, x0, y0: ").split())
+        if x0 < RECT[0][0] or x0 < RECT[0][1]:
+            print(f"x должен быть в пределе от {RECT[0][0]} до {RECT[0][1]} ")
+            return
         
+        if y0 < RECT[1][0] or y0 < RECT[1][1]:
+            print(f"y должен быть в пределе от {RECT[1][0]} до {RECT[1][1]} ")
+            return
     except ValueError:
         print("Некорректный ввод")
 
