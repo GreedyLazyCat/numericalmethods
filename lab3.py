@@ -90,17 +90,27 @@ def start():
 
     try:
         epsilon, x0, y0 = map(float, input("Введите epsilon, x0, y0: ").split())
-        if x0 < RECT[0][0] or x0 < RECT[0][1]:
+        if x0 < RECT[0][0] or x0 > RECT[0][1]:
             print(f"x должен быть в пределе от {RECT[0][0]} до {RECT[0][1]} ")
             return
         
-        if y0 < RECT[1][0] or y0 < RECT[1][1]:
+        if y0 < RECT[1][0] or y0 > RECT[1][1]:
             print(f"y должен быть в пределе от {RECT[1][0]} до {RECT[1][1]} ")
             return
+
+        points = list(method(epsilon, x0, y0))
+        x_points = []        
+        y_points = []
+        for point in points:
+            x_points.append(point[0])        
+            y_points.append(point[1])
+        plt.plot(x_points, y_points, marker='o')  # marker='o' чтобы точки тоже были видны
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Линия уровня')
+        plt.grid(True)
+        plt.show()        
+
     except ValueError:
         print("Некорректный ввод")
-
-
-# print(one_dim_descent(f=f, x=np.array([0.0, 1.0]), i=0, a0=-2.0, b0=2.0, epsilon=0.0000001))
-print(list(coord_descent(epsilon=0.000001, x0=0.0, y0=0.0)))
-print(list(grad_descent(epsilon=0.000001, x0=0.0, y0=0.0)))
+start()
