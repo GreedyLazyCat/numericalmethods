@@ -104,7 +104,7 @@ def start():
         for point in points:
             x_points.append(point[0])        
             y_points.append(point[1])
-        plt.plot(x_points, y_points, marker='o')  # marker='o' чтобы точки тоже были видны
+        plt.plot(x_points, y_points, marker='o')
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title('Линия уровня')
