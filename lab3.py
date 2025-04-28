@@ -5,18 +5,18 @@ import matplotlib.pyplot as plt
 PHI = (1 + np.sqrt(5)) / 2
 MAX_ITER = 1000
 RECT = [
-    [-10.0, 10.0],
-    [-10.0, 10.0]
+    [-5.0, 5.0],
+    [-5.0, 5.0]
 ]
 
-def derrivative_x(x):
-    return 2*(x - 1)
+def derivative_x(x):
+    return np.cos(x[0]) * np.cos(x[1] / 2)
 
-def derrivative_y(y):
-    return 2*(y - 1)
+def derivative_y(y):
+    return -1 * np.sin(y[0]) * np.sin(y[1] / 2) / 2
 
 def f(x):
-    return (x[0] - 1)**2 + (x[1] - 1)**2
+    return np.sin(x[0]) * np.cos(x[1] / 2)
 
 def one_dim_descent(*, f, x, i, a0, b0, epsilon):
     a = a0
@@ -58,23 +58,31 @@ def coord_descent(epsilon, x0, y0):
     return xk
 
 def grad_descent(epsilon, x0, y0):
-    x = np.array([x0, y0])
-    xk = np.array([x0, y0])
+    xk = np.array([x0, y0], dtype=float)
     iter = 0
     while True:
-        x = np.copy(xk)
-        yield x
+        x_prev = np.copy(xk)
+        yield x_prev
 
-        def phi(A):
-            return f(xk - A * np.array([derrivative_x(xk[0]), derrivative_y(xk[1])]))
+        grad = np.array([
+            derivative_x(xk),
+            derivative_y(xk)
+        ])
 
-        newA = one_dim_descent(f=phi, x=xk, i=0, a0=0, b0=10000, epsilon=epsilon)
-        xk = (x - newA * np.array([derrivative_x(x[0]), derrivative_y(x[1])]))
-        if np.linalg.norm(xk - x) < epsilon:
+        def phi(alpha):
+            return f(xk - alpha * grad)
+
+        alpha_opt = one_dim_descent(f=phi, x=[0], i=0, a0=0, b0=10, epsilon=epsilon)
+        xk = xk - alpha_opt * grad
+
+        if np.linalg.norm(xk - x_prev) < epsilon:
             break
+
         if iter > MAX_ITER:
+            print("Превышено максимальное число итераций")
             break
         iter += 1
+
 
 
 def start():
@@ -90,6 +98,7 @@ def start():
             method = grad_descent 
         case _:
             print("Такого варианта нет")
+            return
 
     try:
         epsilon, x0, y0 = map(float, input("Введите epsilon, x0, y0: ").split())
@@ -107,7 +116,15 @@ def start():
         for point in points:
             x_points.append(point[0])        
             y_points.append(point[1])
-        plt.plot(x_points, y_points, marker='o')
+        
+        extent = 5
+        x = np.linspace(RECT[0][0] - extent, RECT[0][1] + extent, 400)
+        y = np.linspace(RECT[1][0] - extent, RECT[1][1] + extent, 400)
+        X, Y = np.meshgrid(x, y)
+        Z = np.sin(X) * np.cos(Y / 2)
+
+        plt.contour(X, Y, Z, levels=30, cmap='jet')
+        plt.plot(x_points, y_points, marker='o', color='red')  
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title('Линия уровня')
@@ -116,4 +133,5 @@ def start():
 
     except ValueError:
         print("Некорректный ввод")
+
 start()
