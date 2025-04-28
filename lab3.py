@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 
 
 PHI = (1 + np.sqrt(5)) / 2
-MAX_ITER = 100
+MAX_ITER = 1000
 RECT = [
-    [-2.0, 2.0],
-    [-2.0, 2.0]
+    [-10.0, 10.0],
+    [-10.0, 10.0]
 ]
 
 def derrivative_x(x):
@@ -14,8 +14,6 @@ def derrivative_x(x):
 
 def derrivative_y(y):
     return 2*(y - 1)
-
-
 
 def f(x):
     return (x[0] - 1)**2 + (x[1] - 1)**2
@@ -62,6 +60,7 @@ def coord_descent(epsilon, x0, y0):
 def grad_descent(epsilon, x0, y0):
     x = np.array([x0, y0])
     xk = np.array([x0, y0])
+    iter = 0
     while True:
         x = np.copy(xk)
         yield x
@@ -73,6 +72,10 @@ def grad_descent(epsilon, x0, y0):
         xk = (x - newA * np.array([derrivative_x(x[0]), derrivative_y(x[1])]))
         if np.linalg.norm(xk - x) < epsilon:
             break
+        if iter > MAX_ITER:
+            break
+        iter += 1
+
 
 def start():
     print("Выберете метод:")
