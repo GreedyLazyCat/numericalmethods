@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import traceback
 
 PHI = (1 + np.sqrt(5)) / 2
 MAX_ITER = 1000
@@ -41,21 +41,29 @@ def one_dim_descent(*, f, x, i, a0, b0, epsilon):
     return xi 
 
 def coord_descent(epsilon, x0, y0):
-    x = np.array([x0, y0])
     xk = np.array([x0, y0])
     iter = 0
     while True:
-        x = np.copy(xk)
-        yield x
+        x_prev = np.copy(xk)
+        yield x_prev
+        
         for i in range(len(xk)):
-            xk[i] = one_dim_descent(f=f, x=xk, i=i, a0=RECT[i][0], b0=RECT[i][1], epsilon=epsilon)
-        if np.linalg.norm(xk - x) < epsilon:
-            break
-        if iter > MAX_ITER:
+            xk[i] = one_dim_descent(
+                f=f,
+                x=xk,
+                i=i,
+                a0=RECT[i][0],
+                b0=RECT[i][1],
+                epsilon=epsilon
+            )
+            if np.linalg.norm(xk - x_prev) < epsilon:
+                break
+            
+        if iter >= MAX_ITER:
+            print("Превышено максимальное число итераций")
             break
         iter += 1
-        
-    return xk
+    
 
 def grad_descent(epsilon, x0, y0):
     xk = np.array([x0, y0], dtype=float)
@@ -111,6 +119,7 @@ def start():
             return
 
         points = list(method(epsilon, x0, y0))
+        print(points)
         x_points = []        
         y_points = []
         for point in points:
@@ -132,6 +141,7 @@ def start():
         plt.show()        
 
     except ValueError:
+        print(traceback.format_exc())
         print("Некорректный ввод")
 
 start()
