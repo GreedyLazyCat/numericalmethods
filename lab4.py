@@ -24,7 +24,6 @@ def phi(t, i):
 
 def derivative_first(func, t, h=0.001):
     """Аппроксимация первой производной"""
-    # Проверка для граничных точек
     if t - h < 0:
         return (func(t + h) - func(t)) / h
     elif t + h > 1:
@@ -34,7 +33,6 @@ def derivative_first(func, t, h=0.001):
 
 def derivative_second(func, t, h=0.001):
     """Аппроксимация второй производной"""
-    # Проверка для граничных точек
     if t - h < 0:
         return (func(t) - 2*func(t + h/2) + func(t + h)) / (h**2/4)
     elif t + h > 1:
@@ -59,32 +57,18 @@ def inner_product(func1, func2, a=0, b=1, n=1000):
 
 def solve_galerkin(N):
     """Решение краевой задачи методом Галеркина с N базисными функциями"""
-    
-    # Строим матрицу A и вектор b
     A = np.zeros((N, N))
     b = np.zeros(N)
     
     for i in range(N):
         for j in range(N):
-            # Определяем функцию для интегрирования phi_j(t) * L(phi_i)(t)
-            def integrand(t):
-                return phi(t, j+1) * L_operator(lambda t: phi(t, i+1), t)
-            
-            # Вычисляем элемент матрицы A
             A[i, j] = inner_product(lambda t: phi(t, j+1), 
                                    lambda t: L_operator(lambda t: phi(t, i+1), t))
         
-        # Определяем функцию для интегрирования phi_i(t) * f(t)
-        def integrand_b(t):
-            return phi(t, i+1) * f(t)
-        
-        # Вычисляем элемент вектора b
         b[i] = inner_product(lambda t: phi(t, i+1), f)
     
-    # Решаем систему линейных уравнений A*C = b
     C = np.linalg.solve(A, b)
     
-    # Функция приближенного решения
     def x_N(t):
         result = 0
         for i in range(N):
@@ -94,7 +78,6 @@ def solve_galerkin(N):
     return x_N, C
 
 def main():
-    # Ввод количества базисных функций
     try:
         N = int(input("Введите количество базисных функций N: "))
         if N <= 0:
@@ -104,15 +87,12 @@ def main():
         print("Ошибка: Введите целое число")
         return
     
-    # Решаем задачу методом Галеркина
     x_N, coefficients = solve_galerkin(N)
     
-    # Выводим найденные коэффициенты
     print("\nНайденные коэффициенты C_i:")
     for i, c in enumerate(coefficients):
         print(f"C_{i+1} = {c:.6f}")
     
-    # Построение графика решения
     t = np.linspace(0, 1, 1000)
     y = np.array([x_N(ti) for ti in t])
     
@@ -125,7 +105,6 @@ def main():
     plt.axhline(y=0, color='k', linestyle='-', alpha=0.3)
     plt.axvline(x=0, color='k', linestyle='-', alpha=0.3)
     
-    # Проверка краевых условий
     print(f"\nПроверка краевых условий:")
     print(f"x(0) = {x_N(0):.6f}")
     print(f"x(1) = {x_N(1):.6f}")
