@@ -24,21 +24,11 @@ def phi(t, i):
 
 def derivative_first(func, t, h=0.001):
     """Аппроксимация первой производной"""
-    if t - h < 0:
-        return (func(t + h) - func(t)) / h
-    elif t + h > 1:
-        return (func(t) - func(t - h)) / h
-    else:
-        return (func(t + h) - func(t - h)) / (2 * h)
+    return (func(t + h) - func(t - h)) / (2 * h)
 
 def derivative_second(func, t, h=0.001):
     """Аппроксимация второй производной"""
-    if t - h < 0:
-        return (func(t) - 2*func(t + h/2) + func(t + h)) / (h**2/4)
-    elif t + h > 1:
-        return (func(t - h) - 2*func(t - h/2) + func(t)) / (h**2/4)
-    else:
-        return (func(t - h) - 2*func(t) + func(t + h)) / h**2
+    return (func(t - h) - 2*func(t) + func(t + h)) / h**2
 
 def L_operator(func, t, h=0.001):
     """Оператор L(x) = x'' + p(t)x' + q(t)x"""
