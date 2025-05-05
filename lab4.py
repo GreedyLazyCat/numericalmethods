@@ -2,103 +2,71 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import simpson
 
-
-def gauss_elimination(A, b):
-    reshaped_b = b.reshape((len(b), 1))
-    A = np.hstack((A, reshaped_b))
-
-    for i in range(len(A)):
-        for j in range(i + 1, len(A)):
-            A[j] -= A[i] * A[j][i] / A[i][i]
-
-
-    x = np.array([0] * len(b), dtype=float)
-
-    i = len(A) - 1
-    while i >= 0:
-        x[i] = (A[i][-1] - sum(x * A[i][0:-1])) / A[i][i]
+def gaussian_elimination(A, b):
+    n = len(b)
+    aug_matrix = np.column_stack((A, b))
+    
+    for i in range(n):
+        max_row = i + np.argmax(np.abs(aug_matrix[i:n, i]))
+        if max_row != i:
+            aug_matrix[[i, max_row]] = aug_matrix[[max_row, i]]
+        
+        for j in range(i + 1, n):
+            factor = aug_matrix[j, i] / aug_matrix[i, i]
+            aug_matrix[j, i:] -= factor * aug_matrix[i, i:]
+    
+    x = np.zeros(n)
+    for i in range(n - 1, -1, -1):
+        x[i] = (aug_matrix[i, -1] - np.sum(aug_matrix[i, i+1:n] * x[i+1:])) / aug_matrix[i, i]
+    
     return x
 
+
+
 def p(t):
-    """Коэффициент при первой производной"""
     return 2*t
 
 def q(t):
-    """Коэффициент при функции"""
     return t**2 + 1
 
 def f(t):
-    """Правая часть уравнения"""
     return np.sin(np.pi*t)
 
 def phi(t, i):
-    """Базисная функция phi_i(t)
-    
-    Удовлетворяет краевым условиям: phi_i(0) = 0, phi_i(1) = 0
-    phi_i(t) = t^i * (1-t)
-    """
     return t**i * (1-t)
 
 def derivative_first(func, t, h=0.001):
-    """Аппроксимация первой производной"""
     return (func(t + h) - func(t - h)) / (2 * h)
 
 def derivative_second(func, t, h=0.001):
-    """Аппроксимация второй производной"""
     return (func(t - h) - 2*func(t) + func(t + h)) / h**2
 
 def L_operator(func, t, h=0.001):
-    """Оператор L(x) = x'' + p(t)x' + q(t)x"""
     d2 = derivative_second(func, t, h)
     d1 = derivative_first(func, t, h)
     return d2 + p(t) * d1 + q(t) * func(t)
 
 def inner_product(func1, func2, a=0, b=1, n=1000):
-    """Скалярное произведение <func1, func2> = ∫func1(t)·func2(t)dt от a до b
-    
-    Используется метод Симпсона для интегрирования с хорошей точностью
-    """
     t = np.linspace(a, b, n)
     y = np.array([func1(ti) * func2(ti) for ti in t])
     return simpson(y, t)
 
-def solve_linear_system(A, b):
-    """
-    Решение системы линейных уравнений A*x = b с использованием SVD
-    
-    Args:
-        A: матрица коэффициентов (numpy array размера n x n)
-        b: вектор правой части (numpy array размера n)
-        
-    Returns:
-        x: вектор решения (numpy array размера n)
-    """
-    # Выполняем SVD разложение
-    U, s, Vh = np.linalg.svd(A, full_matrices=False)
-    
-    # Проверяем сингулярные значения на близость к нулю
-    tol = 1e-10
-    s_inv = np.array([1/si if si > tol else 0 for si in s])
-    
-    # Вычисляем решение
-    x = Vh.T @ (s_inv * (U.T @ b))
-    
-    return x
 
 def solve_galerkin(N):
-    """Решение краевой задачи методом Галеркина с N базисными функциями"""
     A = np.zeros((N, N))
     b = np.zeros(N)
     
     for i in range(N):
         for j in range(N):
-            A[i, j] = inner_product(lambda t: phi(t, j+1), 
-                                  lambda t: L_operator(lambda t: phi(t, i+1), t))
+            A[i, j] = inner_product(
+                        lambda t: phi(t, j+1), 
+                        lambda t: L_operator(lambda s: phi(s, i+1), t)
+                    ) 
         b[i] = inner_product(lambda t: phi(t, i+1), f)
-    
-    # Используем SVD вместо метода Гаусса
-    C = solve_linear_system(A, b)
-    
+    print(A)
+    print(b)
+    C = gaussian_elimination(A, b)
+    # C = np.linalg.solve(A, b) 
     def x_N(t):
         result = 0
         for i in range(N):

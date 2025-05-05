@@ -80,7 +80,7 @@ def grad_descent(epsilon, x0, y0):
         def phi(alpha):
             return f(xk - alpha * grad)
 
-        alpha_opt = one_dim_descent(f=phi, x=[0], i=0, a0=0, b0=10, epsilon=epsilon)
+        alpha_opt = one_dim_descent(f=phi, x=[0], i=0, a0=0, b0=2, epsilon=epsilon)
         xk = xk - alpha_opt * grad
 
         if np.linalg.norm(xk - x_prev) < epsilon:
